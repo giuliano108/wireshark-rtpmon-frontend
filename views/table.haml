@@ -1,0 +1,16 @@
+%table.table
+  %tr
+    %th src
+    %th port
+    %th dst
+    %th port
+    %th SSRC
+    %th npkts
+  - @reader.records.each do |r|
+    %tr
+      %td #{r.src_addr}
+      %td #{r.rtp_stream_info.src_port}
+      %td #{r.dest_addr}
+      %td #{r.rtp_stream_info.dest_port}
+      %td #{"0x%08x" % r.rtp_stream_info.ssrc}
+      %td #{r.rtp_stream_info.npackets}

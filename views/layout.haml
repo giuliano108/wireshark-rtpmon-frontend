@@ -1,0 +1,58 @@
+!!!
+%html{:lang => 'en'}
+  %head
+    %title= @title || SiteConfig.title
+    %link{:href => '/bootstrap.min.css', :rel => 'stylesheet', :type => 'text/css'}
+    :css
+      .navbar .brand {
+        -moz-transition: all 0.2s linear 0s;
+        color: #5DDD00;
+        font-weight: bold;
+        margin-left: 10px;
+        text-shadow: 0 0 5px #5DDD00;
+      }
+    %script{:type => 'text/javascript', :src => 'js/jquery-1.7.2.min.js'}
+    %script{:type => 'text/javascript', :src => 'js/bootstrap-tooltip.js'}
+    %script{:type => 'text/javascript', :src => 'js/spin.min.js'}
+    %script{:type => 'text/javascript', :src => 'js/jquery-spin.js'}
+  %body
+    .navbar
+      .navbar-inner
+        .container
+          %ul.nav
+            %li
+              %p#spinner.navbar-text
+                &nbsp;
+          %a.brand{:href => '/'} #{SiteConfig.title}
+          %ul.nav
+            %li
+              %p.navbar-text passive rtp monitor
+
+    #content= yield
+    %hr
+      .container
+        .pull-left
+          #{SiteConfig.title}
+        .pull-right= "(#{Sinatra::Base.environment.to_s} on #{request.env['SERVER_SOFTWARE'].gsub(/[ \/].*$/, '')})"
+
+:javascript
+  function data_load(tag) {
+    $.ajax({
+        url: "/data/"+tag,
+        dataType: 'html'
+      }).done(function(d) {
+        $('#table').append(d);
+      });
+  }
+  $('#spinner')
+  .ajaxStart(function() {
+    $(this).spin('small');
+  })
+  .ajaxStop(function() {
+    $('.btn').removeClass('disabled');
+    $(this).spin(false);
+  });
+  $(document).ready(function() {   
+    //$('#spinner').spin('small');
+    data_load('html');
+  })
