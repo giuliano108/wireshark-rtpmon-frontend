@@ -3,7 +3,9 @@
 TypeMap = {
      'guint16' => 'uint16',
      'guint32' => 'uint32',
-     'int'     => 'int32'
+     'int'     => 'int32',
+     'gint'    => 'int32',
+     'double'  => 'double'
 }
 
 def structname_to_classname(structname)

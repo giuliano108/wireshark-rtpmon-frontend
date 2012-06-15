@@ -41,7 +41,7 @@
         url: "/data/"+tag,
         dataType: 'html'
       }).done(function(d) {
-        $('#table').append(d);
+        $('#table').empty().append(d);
       });
   }
   $('#spinner')

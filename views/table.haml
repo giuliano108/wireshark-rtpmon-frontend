@@ -1,16 +1,24 @@
 %table.table
   %tr
+    %th start
+    %th duration
     %th src
-    %th port
     %th dst
-    %th port
     %th SSRC
     %th npkts
+    %th max delta (ms)
+    %th max jitter (ms)
+    %th mean jitter (ms)
+    %th lost
   - @reader.records.each do |r|
     %tr
-      %td #{r.src_addr}
-      %td #{r.rtp_stream_info.src_port}
-      %td #{r.dest_addr}
-      %td #{r.rtp_stream_info.dest_port}
-      %td #{"0x%08x" % r.rtp_stream_info.ssrc}
-      %td #{r.rtp_stream_info.npackets}
+      %td= pp_unix_time(r.rtp_stream_info.start_sec)
+      %td= pp_duration(r.rtp_stream_info.stop_rel_sec - r.rtp_stream_info.start_rel_sec)
+      %td= "#{r.src_addr}:#{r.rtp_stream_info.src_port}"
+      %td= "#{r.dest_addr}:#{r.rtp_stream_info.dest_port}"
+      %td= "0x%08x" % r.rtp_stream_info.ssrc
+      %td= r.rtp_stream_info.npackets
+      %td= "%.2f" % r.rtp_stats.max_delta
+      %td= "%.2f" % r.rtp_stats.max_jitter
+      %td= "%.2f" % r.rtp_stats.mean_jitter
+      %td= calc_lost(r.rtp_stats)

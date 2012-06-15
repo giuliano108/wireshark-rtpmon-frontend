@@ -36,42 +36,42 @@ class TapRtpStatT < BinData::Record
   uint32     :timestamp                    
   uint32     :first_timestamp              
   uint32     :delta_timestamp              
-  string     :bandwidth                     , :length => 8
+  double     :bandwidth                    
   string     :bw_history                    , :length => 4800
   uint16     :bw_start_index               
   uint16     :bw_index                     
   uint32     :total_bytes                  
   uint32     :clock_rate                   
   skip                                        :length => 4
-  string     :delta                         , :length => 8
-  string     :jitter                        , :length => 8
-  string     :diff                          , :length => 8
-  string     :skew                          , :length => 8
-  string     :sumt                          , :length => 8
-  string     :sumTS                         , :length => 8
-  string     :sumt2                         , :length => 8
-  string     :sumtTS                        , :length => 8
-  string     :time                          , :length => 8
-  string     :start_time                    , :length => 8
-  string     :lastnominaltime               , :length => 8
-  string     :max_delta                     , :length => 8
-  string     :max_jitter                    , :length => 8
-  string     :max_skew                      , :length => 8
-  string     :mean_jitter                   , :length => 8
+  double     :delta                        
+  double     :jitter                       
+  double     :diff                         
+  double     :skew                         
+  double     :sumt                         
+  double     :sumTS                        
+  double     :sumt2                        
+  double     :sumtTS                       
+  double     :time                         
+  double     :start_time                   
+  double     :lastnominaltime              
+  double     :max_delta                    
+  double     :max_jitter                   
+  double     :max_skew                     
+  double     :mean_jitter                  
   uint32     :max_nr                       
   uint16     :start_seq_nr                 
   uint16     :stop_seq_nr                  
   uint32     :total_nr                     
   uint32     :sequence                     
   string     :under                         , :length => 4
-  string     :cycles                        , :length => 4
+  int32      :cycles                       
   uint16     :pt                           
   skip                                        :length => 2
   int32      :reg_pt                       
 end
 class BwHistoryItem < BinData::Record
   endian     :little                       
-  string     :time                          , :length => 8
+  double     :time                         
   uint32     :bytes                        
   skip                                        :length => 4
 end

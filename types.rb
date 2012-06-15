@@ -1,9 +1,11 @@
 class RtpmonRecord
-    attr_reader :rtp_stream_info, :src_addr, :dest_addr
+    attr_reader :rtp_stream_info, :src_addr, :dest_addr, :rtp_stats
     def initialize(r,s_addr,d_addr)
         @rtp_stream_info = r
         @src_addr        = s_addr
         @dest_addr       = d_addr
+		#TODO turn TapRtpStatT into a type that can be directly used in RtpStreamInfoT
+		@rtp_stats = TapRtpStatT.read(StringIO.new(@rtp_stream_info.rtp_stats,'r'))
     end
 end
 
