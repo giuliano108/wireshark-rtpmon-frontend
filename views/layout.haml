@@ -8,11 +8,20 @@
         -moz-transition: all 0.2s linear 0s;
         color: #5DDD00;
         font-weight: bold;
-        margin-left: 10px;
+        margin-left: 20px;
         text-shadow: 0 0 5px #5DDD00;
+      }
+      #spinner {
+        position: absolute;
+        top: -1px;
+        left: 5px;
+      }
+      #toggle-refresh {
+        margin-right: 50px;
       }
     %script{:type => 'text/javascript', :src => 'js/jquery-1.7.2.min.js'}
     %script{:type => 'text/javascript', :src => 'js/bootstrap-tooltip.js'}
+    %script{:type => 'text/javascript', :src => 'js/bootstrap-button.js'}
     %script{:type => 'text/javascript', :src => 'js/spin.min.js'}
     %script{:type => 'text/javascript', :src => 'js/jquery-spin.js'}
   %body
@@ -27,6 +36,9 @@
           %ul.nav
             %li
               %p.navbar-text passive rtp monitor
+          %ul.nav.pull-right
+            %li
+              %button#toggle-refresh.btn.btn-primary{'data-toggle' => 'button'} Auto-refresh is: OFF
 
     #content= yield
     %hr
@@ -36,23 +48,85 @@
         .pull-right= "(#{Sinatra::Base.environment.to_s} on #{request.env['SERVER_SOFTWARE'].gsub(/[ \/].*$/, '')})"
 
 :javascript
+  var prev_state = 'quiet';
+  var cur_state  = 'quiet'; // {quiet,counting,loading}
+  var time_started;
+  var wait_how_long = 5000;
+  var counter_timeout_interval = 100;
+
+  function enter_state(new_state) {
+    prev_state = cur_state;
+    cur_state  = new_state;
+  }
+
+  function start_loading() {
+    enter_state('loading');
+  }
+
+  function set_started() {
+    time_started = new Date().getTime();
+  }
+
+  function done_loading() {
+    if (prev_state == 'counting') {
+      enter_state('counting');
+      set_started();
+      do_count();
+    } else {
+      enter_state('quiet');
+    }
+  }
+
   function data_load(tag) {
+    enter_state('loading');
     $.ajax({
         url: "/data/"+tag,
         dataType: 'html'
       }).done(function(d) {
-        $('#table').empty().append(d);
+        if(tag == 'html') {
+          $('#table').empty().append(d);
+        }
+        done_loading();
       });
   }
+
   $('#spinner')
-  .ajaxStart(function() {
-    $(this).spin('small');
-  })
-  .ajaxStop(function() {
-    $('.btn').removeClass('disabled');
-    $(this).spin(false);
+    .ajaxStart(function() {
+      $(this).spin('small');
+    })
+    .ajaxStop(function() {
+      $(this).spin(false);
+    });
+
+  function do_count(){
+    if(cur_state == 'counting') {
+      now = new Date().getTime();
+      elapsed = now-time_started;
+      elapsed_sec = Math.round((wait_how_long-elapsed)/1000);
+      $("#spinner").html(elapsed_sec);
+      if (elapsed < wait_how_long) {
+        setTimeout(do_count,counter_timeout_interval);
+      } else {
+        $('#spinner').html('&nbsp;')
+        data_load('html');
+      }
+    } else {
+      $('#spinner').html('&nbsp;')
+    }
+  };
+
+  $('#toggle-refresh').button().click(function(){
+    if ($(this).hasClass('active')) {
+      enter_state('quiet');
+      $(this).html('Auto-refresh is: OFF');
+    } else {
+      $(this).html('Auto-refresh is: ON');
+      enter_state('counting');
+      set_started();
+      do_count();
+    }
   });
+
   $(document).ready(function() {   
-    //$('#spinner').spin('small');
     data_load('html');
   })

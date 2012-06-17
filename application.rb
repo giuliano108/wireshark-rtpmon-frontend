@@ -29,6 +29,10 @@ helpers do
             || strinfo->rtp_stats.flags & STAT_FLAG_WRONG_SEQ)
             strinfo->problem = TRUE;
 
+reset_start
+display_number
+ajax (handles spinner)
+
 =end
 end
 
@@ -44,6 +48,7 @@ get '/' do
 end
 
 get '/data/:format' do
+    sleep 3
     last_index = 0
     File.open(DataPath+'/rtpmonlast.txt','r') { |file| last_index = file.gets.to_i }
     @reader = RtpmonReader.new(DataPath+'/'+("rtpmon%05d.bin" % last_index))
