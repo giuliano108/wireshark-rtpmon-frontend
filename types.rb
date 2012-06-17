@@ -1,5 +1,6 @@
 class RtpmonRecord
     attr_reader :rtp_stream_info, :src_addr, :dest_addr, :rtp_stats
+	attr_accessor :hash, :dir
     def initialize(r,s_addr,d_addr)
         @rtp_stream_info = r
         @src_addr        = s_addr

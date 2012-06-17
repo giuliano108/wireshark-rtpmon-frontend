@@ -48,10 +48,22 @@ get '/' do
 end
 
 get '/data/:format' do
-    sleep 3
     last_index = 0
     File.open(DataPath+'/rtpmonlast.txt','r') { |file| last_index = file.gets.to_i }
     @reader = RtpmonReader.new(DataPath+'/'+("rtpmon%05d.bin" % last_index))
+    @records = @reader.records.to_a
+    @records.each do |r|
+        r.src_addr =~ /^213/ ? r.dir = 1 : r.dir = 0
+        s = "#{r.src_addr}:#{r.rtp_stream_info.src_port}"
+        d = "#{r.dest_addr}:#{r.rtp_stream_info.dest_port}"
+        if (s <=> d) >= 0
+            r.hash = "#{s}-#{d}"
+        else
+            r.hash = "#{d}-#{s}"
+        end
+    end
+    @records.sort_by! { |r| [r.rtp_stream_info.start_sec, r.hash, r.dir]}
+
     if params[:format] == 'html'
         haml :table, :layout => false
     else

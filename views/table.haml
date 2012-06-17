@@ -1,24 +1,41 @@
 %table.table
-  %tr
-    %th start
-    %th duration
-    %th src
-    %th dst
-    %th SSRC
-    %th npkts
-    %th max delta (ms)
-    %th max jitter (ms)
-    %th mean jitter (ms)
-    %th lost
-  - @reader.records.each do |r|
+  %thead
     %tr
-      %td= pp_unix_time(r.rtp_stream_info.start_sec)
-      %td= pp_duration(r.rtp_stream_info.stop_rel_sec - r.rtp_stream_info.start_rel_sec)
-      %td= "#{r.src_addr}:#{r.rtp_stream_info.src_port}"
-      %td= "#{r.dest_addr}:#{r.rtp_stream_info.dest_port}"
-      %td= "0x%08x" % r.rtp_stream_info.ssrc
-      %td= r.rtp_stream_info.npackets
-      %td= "%.2f" % r.rtp_stats.max_delta
-      %td= "%.2f" % r.rtp_stats.max_jitter
-      %td= "%.2f" % r.rtp_stats.mean_jitter
-      %td= calc_lost(r.rtp_stats)
+      %th dir
+      %th start
+      %th duration
+      %th src
+      %th dst
+      %th SSRC
+      %th npkts
+      %th max delta (ms)
+      %th max jitter (ms)
+      %th mean jitter (ms)
+      %th lost
+  %tbody
+    - last_hash = ''
+    - @records.each do |r|
+      - if r.hash != last_hash
+        - td_class  = 'fgs'
+      - else
+        - td_class = nil
+      - last_hash = r.hash
+      %tr
+        %td{:class => td_class}
+          - if r.dir == 0
+            %i.icon-arrow-right
+          - else
+            %i.icon-arrow-left
+        %td{:class => td_class}= pp_unix_time(r.rtp_stream_info.start_sec)
+        %td{:class => td_class}= pp_duration(r.rtp_stream_info.stop_rel_sec - r.rtp_stream_info.start_rel_sec)
+        %td{:class => td_class}= "#{r.src_addr}:#{r.rtp_stream_info.src_port}"
+        %td{:class => td_class}= "#{r.dest_addr}:#{r.rtp_stream_info.dest_port}"
+        %td{:class => td_class}= "0x%08x" % r.rtp_stream_info.ssrc
+        %td{:class => td_class}= r.rtp_stream_info.npackets
+        %td{:class => td_class}= "%.2f" % r.rtp_stats.max_delta
+        %td{:class => td_class}= "%.2f" % r.rtp_stats.max_jitter
+        %td{:class => td_class}= "%.2f" % r.rtp_stats.mean_jitter
+        %td{:class => td_class}= calc_lost(r.rtp_stats)
+  %tfoot
+    %tr
+      %td test
